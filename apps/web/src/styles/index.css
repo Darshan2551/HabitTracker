@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas: #f0f9ff;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-muted: #475569;
+  --color-accent: #0ea5e9;
+  --color-border: #dbeafe;
+  --font-scale: 1;
+  --motion-reduce: 0;
+  --contrast-high: 0;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: calc(16px * var(--font-scale));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:root[style*='--motion-reduce: 1'] * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+:root[style*='--contrast-high: 1'] {
+  --color-border: #0f172a;
+}
+
+.habit-calendar {
+  width: 100%;
+  border: none;
+}
+
+.habit-calendar .react-calendar__navigation button {
+  border-radius: 10px;
+  min-width: 32px;
+}
+
+.habit-calendar .react-calendar__tile {
+  border-radius: 10px;
+}

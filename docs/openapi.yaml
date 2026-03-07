@@ -1,0 +1,317 @@
+openapi: 3.1.0
+info:
+  title: Habit Tracker API
+  version: 1.0.0
+  description: REST API for authentication, habit management, analytics, notifications, and admin operations.
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: Auth
+  - name: Habits
+  - name: Analytics
+  - name: Exports
+  - name: Settings
+  - name: Notifications
+  - name: Admin
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        csrfToken:
+          type: string
+      required: [accessToken, refreshToken, csrfToken]
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          nullable: true
+        role:
+          type: string
+          enum: [USER, ADMIN]
+        emailVerified:
+          type: boolean
+      required: [id, email, role, emailVerified]
+    Habit:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        schedule:
+          type: object
+        goal:
+          type: object
+        graceDays:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required: [id, title, schedule, createdAt]
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register user and send verification email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+                name: { type: string }
+              required: [email, password]
+      responses:
+        '201':
+          description: Registration accepted
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login with email/password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+              required: [email, password]
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                  csrfToken:
+                    type: string
+  /api/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Rotate refresh token and issue a new access token
+      parameters:
+        - in: header
+          name: x-csrf-token
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Refreshed
+  /api/auth/oauth/google:
+    post:
+      tags: [Auth]
+      summary: Login via Google ID token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken: { type: string }
+              required: [idToken]
+      responses:
+        '200':
+          description: Logged in with Google
+  /api/auth/reset:
+    post:
+      tags: [Auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email }
+              required: [email]
+      responses:
+        '200':
+          description: Accepted
+  /api/habits:
+    get:
+      tags: [Habits]
+      summary: List habits for current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum: [all, today, week, overdue]
+        - in: query
+          name: tag
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Habit list
+    post:
+      tags: [Habits]
+      summary: Create a new habit
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title: { type: string }
+                description: { type: string }
+                schedule: { type: object }
+                goal: { type: object }
+              required: [title, schedule]
+      responses:
+        '201':
+          description: Habit created
+  /api/habits/{id}:
+    get:
+      tags: [Habits]
+      summary: Get habit details and stats
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Habit detail
+    put:
+      tags: [Habits]
+      summary: Update habit
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Habit updated
+    delete:
+      tags: [Habits]
+      summary: Soft delete habit
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Habit deleted
+  /api/habits/{id}/complete:
+    post:
+      tags: [Habits]
+      summary: Mark habit completed
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timestamp: { type: string, format: date-time }
+                note: { type: string }
+      responses:
+        '201':
+          description: Completion recorded
+  /api/analytics/heatmap:
+    get:
+      tags: [Analytics]
+      summary: Completion heatmap
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+        - in: query
+          name: tag
+          schema: { type: string }
+      responses:
+        '200':
+          description: Heatmap data
+  /api/exports/history:
+    get:
+      tags: [Exports]
+      summary: Export completion history as CSV or JSON
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: format
+          schema:
+            type: string
+            enum: [csv, json]
+      responses:
+        '200':
+          description: Export payload
+  /api/settings:
+    get:
+      tags: [Settings]
+      summary: Get user settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings
+    put:
+      tags: [Settings]
+      summary: Update user settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings updated

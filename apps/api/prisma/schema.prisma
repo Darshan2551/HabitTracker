@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CompletionSource {
+  MANUAL
+  BACKFILL
+  OFFLINE_SYNC
+}
+
+enum ReminderChannel {
+  EMAIL
+  PUSH
+  SMS
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+model User {
+  id                   String                   @id @default(uuid()) @db.Uuid
+  email                String                   @unique
+  passwordHash         String?                  @map("password_hash")
+  name                 String?
+  timezone             String                   @default("Asia/Kolkata")
+  locale               String                   @default("en-US")
+  createdAt            DateTime                 @default(now()) @map("created_at")
+  updatedAt            DateTime                 @updatedAt @map("updated_at")
+  emailVerified        Boolean                  @default(false) @map("email_verified")
+  googleId             String?                  @unique @map("google_id")
+  role                 UserRole                 @default(USER)
+  deletedAt            DateTime?                @map("deleted_at")
+  publicProfileEnabled Boolean                  @default(false) @map("public_profile_enabled")
+  habits               Habit[]
+  completions          Completion[]
+  tags                 Tag[]
+  settings             UserSettings?
+  refreshTokens        RefreshToken[]
+  emailTokens          EmailVerificationToken[]
+  passwordResetTokens  PasswordResetToken[]
+  reminders            Reminder[]
+  auditLogs            AuditLog[]
+  pushSubscriptions    PushSubscription[]
+  broadcasts           BroadcastMessage[]       @relation("BroadcastAuthor")
+  follows              Follow[]                 @relation("Follower")
+  followers            Follow[]                 @relation("Following")
+  createdSnapshots     PublicSnapshot[]
+
+  @@map("users")
+}
+
+model Habit {
+  id           String       @id @default(uuid()) @db.Uuid
+  userId       String       @map("user_id") @db.Uuid
+  title        String
+  description  String?
+  color        String?
+  difficulty   Int?
+  isPublic     Boolean      @default(false) @map("public")
+  schedule     Json
+  goal         Json?
+  graceDays    Int          @default(0) @map("grace_days")
+  vacationMode Boolean      @default(false) @map("vacation_mode")
+  snoozedUntil DateTime?    @map("snoozed_until")
+  deletedAt    DateTime?    @map("deleted_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions  Completion[]
+  tags         HabitTag[]
+  reminders    Reminder[]
+  auditLogs    AuditLog[]
+  snapshots    PublicSnapshot[]
+
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("habits")
+}
+
+model Completion {
+  id            String           @id @default(uuid()) @db.Uuid
+  habitId        String           @map("habit_id") @db.Uuid
+  userId         String           @map("user_id") @db.Uuid
+  completedAt    DateTime         @map("completed_at")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  note           String?
+  source         CompletionSource @default(MANUAL)
+  conflictAt     DateTime?        @map("conflict_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  deletedAt      DateTime?        @map("deleted_at")
+  habit          Habit            @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auditLogs      AuditLog[]
+
+  @@index([habitId, completedAt])
+  @@index([userId, completedAt])
+  @@index([deletedAt])
+  @@map("completions")
+}
+
+model Tag {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  name      String
+  color     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habits    HabitTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("tags")
+}
+
+model HabitTag {
+  habitId String @map("habit_id") @db.Uuid
+  tagId   String @map("tag_id") @db.Uuid
+  habit   Habit  @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  tag     Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([habitId, tagId])
+  @@map("habit_tags")
+}
+
+model Reminder {
+  id         String          @id @default(uuid()) @db.Uuid
+  habitId    String          @map("habit_id") @db.Uuid
+  userId     String          @map("user_id") @db.Uuid
+  channel    ReminderChannel
+  timeOfDay  String          @map("time_of_day")
+  days       Json?
+  enabled    Boolean         @default(true)
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @updatedAt @map("updated_at")
+  lastSentAt DateTime?       @map("last_sent_at")
+  habit      Habit           @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, enabled])
+  @@map("reminders")
+}
+
+model UserSettings {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @unique @map("user_id") @db.Uuid
+  themeMode           ThemeMode @default(SYSTEM) @map("theme_mode")
+  palette             String    @default("ocean")
+  accentColor         String    @default("#0ea5e9") @map("accent_color")
+  fontScale           Float     @default(1) @map("font_scale")
+  timezone            String    @default("Asia/Kolkata")
+  locale              String    @default("en-US")
+  emailNotifications  Boolean   @default(true) @map("email_notifications")
+  pushNotifications   Boolean   @default(false) @map("push_notifications")
+  smsNotifications    Boolean   @default(false) @map("sms_notifications")
+  accessibilityReduceMotion Boolean @default(false) @map("a11y_reduce_motion")
+  accessibilityHighContrast Boolean @default(false) @map("a11y_high_contrast")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  revokedAt  DateTime? @map("revoked_at")
+  ipAddress  String?   @map("ip_address")
+  userAgent  String?   @map("user_agent")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+model HabitTemplate {
+  id          String   @id @default(uuid()) @db.Uuid
+  slug        String   @unique
+  title       String
+  description String?
+  schedule    Json
+  goal        Json?
+  tags        Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("habit_templates")
+}
+
+model AuditLog {
+  id           String      @id @default(uuid()) @db.Uuid
+  userId       String      @map("user_id") @db.Uuid
+  habitId      String?     @map("habit_id") @db.Uuid
+  completionId String?     @map("completion_id") @db.Uuid
+  action       String
+  metadata     Json?
+  createdAt    DateTime    @default(now()) @map("created_at")
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit        Habit?      @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  completion   Completion? @relation(fields: [completionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([habitId])
+  @@index([completionId])
+  @@map("audit_logs")
+}
+
+model BroadcastMessage {
+  id         String   @id @default(uuid()) @db.Uuid
+  authorId   String   @map("author_id") @db.Uuid
+  title      String
+  body       String
+  createdAt  DateTime @default(now()) @map("created_at")
+  deliveredAt DateTime? @map("delivered_at")
+  author     User     @relation("BroadcastAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@map("broadcast_messages")
+}
+
+model Follow {
+  id          String   @id @default(uuid()) @db.Uuid
+  followerId  String   @map("follower_id") @db.Uuid
+  followingId String   @map("following_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model PublicSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  habitId    String?  @map("habit_id") @db.Uuid
+  title      String
+  payload    Json
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habit      Habit?   @relation(fields: [habitId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("public_snapshots")
+}
