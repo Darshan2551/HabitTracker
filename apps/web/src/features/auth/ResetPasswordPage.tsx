@@ -19,7 +19,17 @@ export function ResetPasswordPage() {
       toast.success('Password updated');
       navigate('/login');
     },
-    onError: () => toast.error('Invalid or expired reset token'),
+    onError: (error: any) => {
+      const fieldErrors = error.response?.data?.issues?.fieldErrors;
+      const message = error.response?.data?.message;
+      if (fieldErrors?.newPassword?.[0]) {
+        toast.error(`Password: ${fieldErrors.newPassword[0]}`);
+      } else if (message) {
+        toast.error(message);
+      } else {
+        toast.error('Invalid or expired reset token');
+      }
+    },
   });
 
   return (
@@ -41,6 +51,8 @@ export function ResetPasswordPage() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             required
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{10,128}$"
+            title="Password must be 10+ characters and include upper, lower, number, and symbol."
           />
           <Button type="submit" className="w-full" loading={mutation.isPending}>
             Update password

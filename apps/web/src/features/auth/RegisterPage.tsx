@@ -21,8 +21,19 @@ export function RegisterPage() {
       toast.success('Account created. Verify your email and sign in.');
       navigate('/login');
     },
-    onError: () => {
-      toast.error('Failed to register');
+    onError: (error: any) => {
+      const fieldErrors = error.response?.data?.issues?.fieldErrors;
+      const message = error.response?.data?.message;
+
+      if (fieldErrors?.password?.[0]) {
+        toast.error(`Password: ${fieldErrors.password[0]}`);
+      } else if (fieldErrors?.email?.[0]) {
+        toast.error(`Email: ${fieldErrors.email[0]}`);
+      } else if (message) {
+        toast.error(message);
+      } else {
+        toast.error('Failed to register');
+      }
     },
   });
 
@@ -56,6 +67,8 @@ export function RegisterPage() {
           value={form.password}
           onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
           required
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{10,128}$"
+          title="Password must be 10+ characters and include upper, lower, number, and symbol."
         />
         <p className="text-xs text-muted">
           Password must be 10+ characters and include upper, lower, number, and symbol.

@@ -1,0 +1,56 @@
+
+> @habittracker/api@1.0.0 prisma:migrate
+> prisma migrate deploy
+
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "habittracker", schema "public" at "postgres:5432"
+
+1 migration found in prisma/migrations
+
+Applying migration `0001_init`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 0001_init/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.11.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
+npm notice To update run: npm install -g npm@11.11.0
+npm notice
+{"level":30,"time":1772971375586,"pid":1,"hostname":"fd1be459840f","msg":"Server listening at http://127.0.0.1:4000"}
+{"level":30,"time":1772971375586,"pid":1,"hostname":"fd1be459840f","msg":"Server listening at http://172.18.0.5:4000"}
+{"level":30,"time":1772971375586,"pid":1,"hostname":"fd1be459840f","msg":"API running on port 4000"}
+{"level":30,"time":1772971645602,"pid":1,"hostname":"fd1be459840f","reqId":"req-1","req":{"method":"OPTIONS","url":"/api/auth/register","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48006},"msg":"incoming request"}
+{"level":30,"time":1772971645609,"pid":1,"hostname":"fd1be459840f","reqId":"req-1","res":{"statusCode":204},"responseTime":6.454997000051662,"msg":"request completed"}
+{"level":30,"time":1772971645614,"pid":1,"hostname":"fd1be459840f","reqId":"req-2","req":{"method":"POST","url":"/api/auth/register","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48016},"msg":"incoming request"}
+{"level":30,"time":1772971645625,"pid":1,"hostname":"fd1be459840f","reqId":"req-2","res":{"statusCode":400},"responseTime":10.930493999971077,"msg":"request completed"}
+{"level":30,"time":1772971663068,"pid":1,"hostname":"fd1be459840f","reqId":"req-3","req":{"method":"OPTIONS","url":"/api/auth/login","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48006},"msg":"incoming request"}
+{"level":30,"time":1772971663069,"pid":1,"hostname":"fd1be459840f","reqId":"req-3","res":{"statusCode":204},"responseTime":0.6476249999832362,"msg":"request completed"}
+{"level":30,"time":1772971663073,"pid":1,"hostname":"fd1be459840f","reqId":"req-4","req":{"method":"POST","url":"/api/auth/login","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48016},"msg":"incoming request"}
+{"level":30,"time":1772971663145,"pid":1,"hostname":"fd1be459840f","reqId":"req-4","res":{"statusCode":401},"responseTime":71.94585699983872,"msg":"request completed"}
+{"level":30,"time":1772971679904,"pid":1,"hostname":"fd1be459840f","reqId":"req-5","req":{"method":"OPTIONS","url":"/api/auth/register","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48006},"msg":"incoming request"}
+{"level":30,"time":1772971679905,"pid":1,"hostname":"fd1be459840f","reqId":"req-5","res":{"statusCode":204},"responseTime":0.753891000058502,"msg":"request completed"}
+{"level":30,"time":1772971679910,"pid":1,"hostname":"fd1be459840f","reqId":"req-6","req":{"method":"POST","url":"/api/auth/register","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48016},"msg":"incoming request"}
+{"level":30,"time":1772971679965,"pid":1,"hostname":"fd1be459840f","reqId":"req-6","res":{"statusCode":400},"responseTime":54.600546000059694,"msg":"request completed"}
+{"level":30,"time":1772971686975,"pid":1,"hostname":"fd1be459840f","reqId":"req-7","req":{"method":"GET","url":"/docs","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48016},"msg":"incoming request"}
+{"level":30,"time":1772971686977,"pid":1,"hostname":"fd1be459840f","reqId":"req-7","res":{"statusCode":200},"responseTime":1.871373999863863,"msg":"request completed"}
+{"level":30,"time":1772971687103,"pid":1,"hostname":"fd1be459840f","reqId":"req-8","req":{"method":"GET","url":"/docs/static/swagger-ui.css","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":48016},"msg":"incoming request"}
+{"level":30,"time":1772971687114,"pid":1,"hostname":"fd1be459840f","reqId":"req-9","req":{"method":"GET","url":"/docs/static/index.css","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36920},"msg":"incoming request"}
+{"level":30,"time":1772971687117,"pid":1,"hostname":"fd1be459840f","reqId":"req-9","res":{"statusCode":200},"responseTime":3.5597919998690486,"msg":"request completed"}
+{"level":30,"time":1772971687120,"pid":1,"hostname":"fd1be459840f","reqId":"req-8","res":{"statusCode":200},"responseTime":17.06383699993603,"msg":"request completed"}
+{"level":30,"time":1772971687127,"pid":1,"hostname":"fd1be459840f","reqId":"req-a","req":{"method":"GET","url":"/docs/static/swagger-ui-bundle.js","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36936},"msg":"incoming request"}
+{"level":30,"time":1772971687158,"pid":1,"hostname":"fd1be459840f","reqId":"req-a","res":{"statusCode":200},"responseTime":30.569406000198796,"msg":"request completed"}
+{"level":30,"time":1772971687161,"pid":1,"hostname":"fd1be459840f","reqId":"req-b","req":{"method":"GET","url":"/docs/static/swagger-ui-standalone-preset.js","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36940},"msg":"incoming request"}
+{"level":30,"time":1772971687162,"pid":1,"hostname":"fd1be459840f","reqId":"req-c","req":{"method":"GET","url":"/docs/static/swagger-initializer.js","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36952},"msg":"incoming request"}
+{"level":30,"time":1772971687165,"pid":1,"hostname":"fd1be459840f","reqId":"req-c","res":{"statusCode":200},"responseTime":2.0986099999863654,"msg":"request completed"}
+{"level":30,"time":1772971687170,"pid":1,"hostname":"fd1be459840f","reqId":"req-b","res":{"statusCode":200},"responseTime":8.618168000131845,"msg":"request completed"}
+{"level":30,"time":1772971687355,"pid":1,"hostname":"fd1be459840f","reqId":"req-d","req":{"method":"GET","url":"/docs/json","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36940},"msg":"incoming request"}
+{"level":30,"time":1772971687367,"pid":1,"hostname":"fd1be459840f","reqId":"req-d","res":{"statusCode":200},"responseTime":11.678675000090152,"msg":"request completed"}
+{"level":30,"time":1772971687391,"pid":1,"hostname":"fd1be459840f","reqId":"req-e","req":{"method":"GET","url":"/docs/static/favicon-32x32.png","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36940},"msg":"incoming request"}
+{"level":30,"time":1772971687393,"pid":1,"hostname":"fd1be459840f","reqId":"req-e","res":{"statusCode":200},"responseTime":2.6582320001907647,"msg":"request completed"}
+{"level":30,"time":1772971687542,"pid":1,"hostname":"fd1be459840f","reqId":"req-f","req":{"method":"GET","url":"/docs/static/favicon-16x16.png","host":"localhost:4000","remoteAddress":"172.18.0.1","remotePort":36940},"msg":"incoming request"}
+{"level":30,"time":1772971687545,"pid":1,"hostname":"fd1be459840f","reqId":"req-f","res":{"statusCode":200},"responseTime":2.6590120000764728,"msg":"request completed"}
